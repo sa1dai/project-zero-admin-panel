@@ -1,85 +1,41 @@
 import React, { ReactNode } from 'react';
-import QuestionList from 'src/components/QuestionList';
-import { Question } from 'src/types';
-import StackoverflowApiService from 'src/services/StackoverflowApiService';
+import OrderList from 'src/components/OrderList';
+import { Order } from 'src/types';
+import FirebaseApiService from 'src/services/FirebaseApiService';
 import 'src/components/common.css';
 import './App.css';
-import _ from 'lodash';
 
 interface AppState {
-  questions: Question[] | null;
+  orders: Order[] | null;
   error: string | null;
-  newQuestionsFirst: boolean;
 }
 
 class App extends React.Component<{}, AppState> {
   constructor(props: {}) {
     super(props);
     this.state = {
-      questions: null,
-      error: null,
-      newQuestionsFirst: true
+      orders: null,
+      error: null
     };
   }
 
-  private static getSortedQuestions(
-    questions: Question[] | null,
-    newQuestionsFirst: boolean
-  ): Question[] {
-    return _.orderBy(
-      questions,
-      ['creation_date'],
-      [newQuestionsFirst ? 'desc' : 'asc']
-    );
-  }
-
   async componentDidMount(): Promise<void> {
-    const service = new StackoverflowApiService();
+    const service = new FirebaseApiService();
     service
-      .getReactQuestions()
-      .then(questions => {
-        if (!Array.isArray(questions)) {
-          throw new Error('Returned questions is not an array');
-        }
-        const { newQuestionsFirst } = this.state;
-        const sortedQuestions = App.getSortedQuestions(
-          questions,
-          newQuestionsFirst
-        );
-        return this.setState({ questions: sortedQuestions });
-      })
+      .getOrders()
+      .then(orders => this.setState({ orders }))
       .catch(() => this.setState({ error: 'Error occurred!' }));
   }
 
-  private toggleSort = (): void => {
-    const { questions, newQuestionsFirst } = this.state;
-    this.setState({
-      questions: App.getSortedQuestions(questions, !newQuestionsFirst),
-      newQuestionsFirst: !newQuestionsFirst
-    });
-  };
-
   public render(): ReactNode {
-    const { questions, error } = this.state;
+    const { orders, error } = this.state;
     if (error) {
       return <div className="common-screen-center">{error}</div>;
     }
-    if (!questions) {
+    if (!orders) {
       return <div className="common-screen-center">Loading...</div>;
     }
-    const { newQuestionsFirst } = this.state;
-    return (
-      <>
-        <div className="App-header">
-          <button className="App-header-sort-button" onClick={this.toggleSort}>
-            {newQuestionsFirst
-              ? 'Sort: old questions first'
-              : 'Sort: new questions first'}
-          </button>
-        </div>
-        <QuestionList questions={questions} />
-      </>
-    );
+    return <OrderList orders={orders} />;
   }
 }
 

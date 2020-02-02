@@ -1,4 +1,4 @@
-.QuestionList-ul {
+.OrderList-ul {
     /* С margin: 0 auto некорректно считает margin на сматрфонах в devtools */
     margin-left: auto;
     margin-right: auto;
@@ -8,24 +8,12 @@
     padding: 0;
 }
 
-.QuestionList-li {
+.OrderList-li {
     border: 1px solid black;
     margin: 10px 0;
 }
 
-.QuestionList-li-a {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    min-height: 40px;
-    text-decoration: none;
-}
-
-.QuestionList-li-a:link {
-    color: black;
-}
-
-.QuestionList-li-title {
+.OrderList-li-title {
     margin-left: 5px;
     max-width: 90%;
 }
